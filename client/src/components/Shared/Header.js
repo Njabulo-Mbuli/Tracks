@@ -1,13 +1,31 @@
 import React from "react";
 import withStyles from "@material-ui/core/styles/withStyles";
-// import AppBar from "@material-ui/core/AppBar";
-// import Toolbar from "@material-ui/core/Toolbar";
-// import RadioIcon from "@material-ui/icons/RadioTwoTone";
-// import FaceIcon from "@material-ui/icons/FaceTwoTone";
-// import Typography from "@material-ui/core/Typography";
+import AppBar from "@material-ui/core/AppBar";
+import Toolbar from "@material-ui/core/Toolbar";
+import RadioIcon from "@material-ui/icons/RadioTwoTone";
+import FaceIcon from "@material-ui/icons/FaceTwoTone";
+import Typography from "@material-ui/core/Typography";
+
+import {Link} from 'react-router-dom'
 
 const Header = ({ classes }) => {
-  return <div>Header</div>;
+  return (
+    <AppBar position="static" classsName={classes.root}>
+      <Toolbar>
+        {/* Title / Logo */}
+        <Link to="/" className={classes.grow}>
+          <RadioIcon className={classes.logo} color="secondary" />
+          <Typography variant="headline" color="secondary" noWrap>
+            React Tracks
+          </Typography>
+        </Link>
+
+        {/* User info */}
+        <Link>
+        </Link>
+      </Toolbar>
+    </AppBar>
+  )
 };
 
 const styles = theme => ({

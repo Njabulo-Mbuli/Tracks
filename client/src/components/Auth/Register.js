@@ -19,14 +19,21 @@ import VerifiedUserTwoTone from "@material-ui/icons/VerifiedUserTwoTone";
 import {Mutation} from 'react-apollo'
 import {gql} from 'apollo-boost'
 
-const Register = ({ classes }) => {
+import Error from '../Shared/Error'
+
+function Transition(props){
+  return <Slide direction="up" {...props}/>
+}
+
+const Register = ({ classes,setNewUser }) => {
   const [username, setUsername] = useState("")
   const [password, setPassword] = useState("")
   const [email, setEmail] = useState("")
+  const [open,setOpen] = useState(false)
 
   const handleSubmit = async (event,createUser)=>{
     event.preventDefault()
-    await createUser()
+    const res = await createUser()
   }
 
   return (
@@ -43,7 +50,10 @@ const Register = ({ classes }) => {
         <Mutation
           mutation={REGISTER_MUTATION}
           variables={{ username, email, password }}
-          >
+          onCompleted={   data =>{
+            console.log({data})
+            setOpen(true)
+            }}>
           {(createUser,{ loading,error })=>{
             return(
               <form onSubmit={event => handleSubmit(event,createUser)} className={classes.form}>
@@ -72,21 +82,48 @@ const Register = ({ classes }) => {
                   fullWidth
                   variant="contained"
                   color="secondary"
+                  disabled={loading || !username.trim() || !email.trim() || !password.trim()}
                   className={classes.submit}>
-                  Register
+                  { loading? "Registering...": "Register"}
                 </Button>
                 <Button
                   color="primary"
                   variant="outlined"
-                  fullWidth>
+                  fullWidth
+                  onClick={()=>setNewUser(false)}>
                   Previous user? Log in here
                 </Button>
+
+                {/* Error Handling */}
+                {error && <Error error={error} />}
               </form>
             )
           }}
         </Mutation>
 
       </Paper>
+
+      {/* Success Dialog */}
+      <Dialog
+        open={open}
+        disableBackdropClick = {true}
+        TransitionComponent={Transition}>
+          <DialogTitle>
+            <VerifiedUserTwoTone className={classes.icon}/>
+            New Account
+          </DialogTitle>
+          <DialogContent>
+            <DialogContentText>User successfully created!</DialogContentText>
+          </DialogContent>
+          <DialogActions>
+            <Button
+              color="primary"
+              variant="contained"
+              onClick={()=>setNewUser(false)}>
+                Login
+            </Button>
+          </DialogActions>
+      </Dialog>
     </div>
   )
 };
