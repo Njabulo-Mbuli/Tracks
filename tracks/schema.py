@@ -46,9 +46,9 @@ class CreateTrack(graphene.Mutation):
     track = graphene.Field(TrackType)
 
     class Arguments:
-        title = graphene.String()
-        description = graphene.String()
-        url = graphene.String()
+        title = graphene.String(required=True)
+        description = graphene.String(required=True)
+        url = graphene.String(required=True)
 
     def mutate(self,info,title,description,url):
         user = info.context.user

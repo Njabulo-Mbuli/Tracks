@@ -12,13 +12,13 @@ import Signout from '../Auth/Signout'
 
 const Header = ({ classes,currentUser }) => {
   return (
-    <AppBar position="static" classsName={classes.root}>
+    <AppBar position="static" className={classes.root}>
       <Toolbar>
         {/* Title / Logo */}
         <Link to="/" className={classes.grow}>
           <RadioIcon className={classes.logo} color="secondary" />
           <Typography variant="headline" color="secondary" noWrap>
-            ReactTracks
+            Tracks
           </Typography>
         </Link>
 
