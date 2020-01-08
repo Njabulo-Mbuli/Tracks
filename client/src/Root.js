@@ -11,6 +11,9 @@ import Profile from './pages/Profile'
 import Header from './components/Shared/Header'
 import Loading from "./components/Shared/Loading";
 import Error from './components/Shared/Error'
+import { ProvidedRequiredArguments } from "graphql/validation/rules/ProvidedRequiredArguments";
+
+export const UserContext = React.createContext()
 
 const Root = () => (
     <Query query={ME_QUERY}>
@@ -22,13 +25,13 @@ const Root = () => (
             
             return (
                 <Router>
-                    <>
-                    <Header currentUser={currentUser}/>
-                    <Switch>
-                        <Route exact path="/" component={App}/>
-                        <Route path="/profile/:id" component={Profile} />
-                    </Switch>
-                    </>
+                    <UserContext.Provider value={currentUser}>
+                        <Header currentUser={currentUser}/>
+                        <Switch>
+                            <Route exact path="/" component={App}/>
+                            <Route path="/profile/:id" component={Profile} />
+                        </Switch>
+                    </UserContext.Provider>
                 </Router>
             )
         }}

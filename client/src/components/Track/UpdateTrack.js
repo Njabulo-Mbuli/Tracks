@@ -1,4 +1,7 @@
-import React from "react";
+import React, { useState,useContext } from "react";
+import { Mutation } from 'react-apollo'
+import {gql} from 'apollo-boost'
+import axios from 'axios'
 import withStyles from "@material-ui/core/styles/withStyles";
 import IconButton from "@material-ui/core/IconButton";
 import EditIcon from "@material-ui/icons/Edit";
@@ -14,14 +17,23 @@ import DialogTitle from "@material-ui/core/DialogTitle";
 import CircularProgress from "@material-ui/core/CircularProgress";
 import LibraryMusicIcon from "@material-ui/icons/LibraryMusic";
 
-const UpdateTrack = ({ classes }) => {
-  
+import Error from '../Shared/Error'
+import { GET_TRACKS_QUERY } from '../../pages/App'
+
+import { UserContext } from '../../Root'
+
+const UpdateTrack = ({ classes,track }) => {
+
+  const currentUser =  useContext(UserContext)
+   
   const [open,setOpen] = useState(false)
-  const [title,setTitle] = useState("")
-  const [description,setDescription] = useState("")
-  const [file,setFile] = useState("")
+  const [title,setTitle] = useState(track.title)
+  const [description,setDescription] = useState(track.description)
+  const [file,setFile] = useState()
   const [submitting,setSubmitting] = useState(false)
   const [fileError,setFileError] = useState("")
+
+  const isCurrentUser = currentUser.id === track.postedBy.id
 
   const handleAudioChange = (event) =>{
     const selectedFile = event.target.files[0]
@@ -35,7 +47,7 @@ const UpdateTrack = ({ classes }) => {
     }
   }
 
-  const handleAudioUpload= async ()=>{
+  const handleAudioUpload = async () =>{
     try{
       const data = new FormData()
       data.append('file',file)
@@ -52,15 +64,16 @@ const UpdateTrack = ({ classes }) => {
     }
   }
 
-  const handleSubmit = async (event,createTrack) =>{
+  const handleSubmit = async (event,updateTrack) =>{
     event.preventDefault()
     setSubmitting(true)
 
     //UPload our audio file
     const uploadedUrl = await handleAudioUpload()
     
-    createTrack({
+    updateTrack({
       variables:{
+        trackId:track.id,
         title,
         description,
         url:uploadedUrl
@@ -68,20 +81,16 @@ const UpdateTrack = ({ classes }) => {
     })
   }
 
-  return (
+  return isCurrentUser &&  (
     <>
-    {/* CreateTrack Button */}
-    <Button 
-      variant="fab"
-      className={classes.fab}
-      color="secondary"
-      onClick={()=>setOpen(true)}>
-      {open ? <ClearIcon/> : <AddIcon/>}
-    </Button>
+    {/* Update Track Button */}
+    <IconButton onClick={()=>setOpen(true)}>
+      <EditIcon/>
+    </IconButton>
 
-    {/* CreateTrack Dialog */}
+    {/* Update Track Dialog */}
     <Mutation 
-     mutation={CREATE_TRACK_MUTATION}
+     mutation={UPDATE_TRACK_MUTATION}
      onCompleted={(data)=>{
         setSubmitting(false)
         setOpen(false)
@@ -89,17 +98,18 @@ const UpdateTrack = ({ classes }) => {
         setDescription("")
         setFile("")
       }}
-      refetchQueries={()=>[{query:GET_TRACKS_QUERY}]}>
-      {(createTrack,{loading,error})=>{
+      //refetchQueries={()=>[{query:GET_TRACKS_QUERY}]}
+      >
+      {(updateTrack,{loading,error})=>{
         if(error) return <Error error={error}/>
 
         return(
           <Dialog 
             className={classes.dialog}
             open={open}>
-              <form onSubmit={event =>handleSubmit(event,createTrack)}>
+              <form onSubmit={event =>handleSubmit(event,updateTrack)}>
                 <DialogTitle>
-                  Create Track
+                  Update Track
                 </DialogTitle>
                 <DialogContent>
                   <DialogContentText>
@@ -167,7 +177,7 @@ const UpdateTrack = ({ classes }) => {
                   className={classes.save}>
                     {submitting ?
                       <CircularProgress className={classes.save} size={24}/>:
-                      "Add Track"
+                      "Update Track"
                     }
                   </Button>
                 </DialogActions>
@@ -181,7 +191,25 @@ const UpdateTrack = ({ classes }) => {
   )
 };
 
-export default withStyles(styles)(CreateTrack);
+const UPDATE_TRACK_MUTATION =gql`
+mutation($trackId:Int!, $title:String, $url:String){
+  updateTrack(trackId: $trackId, title:$title,url:$url,description:$description){
+    track{
+      id
+      title
+      description
+      url 
+      likes{
+        id
+      }
+      postedBy{
+        id
+        username
+      }
+    }
+  }
+}
+`
 
 const styles = theme => ({
   container: {
