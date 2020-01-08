@@ -16,7 +16,7 @@ import { ProvidedRequiredArguments } from "graphql/validation/rules/ProvidedRequ
 export const UserContext = React.createContext()
 
 const Root = () => (
-    <Query query={ME_QUERY}>
+    <Query query={ME_QUERY} fetchPolicy='cache-and-network'>
         {({data,loading,error})=>{
             if(loading) return <Loading/>
             if(error) return <Error error={error}/>
@@ -38,12 +38,17 @@ const Root = () => (
     </Query>
 )
 
-const ME_QUERY = gql`
+export const ME_QUERY = gql`
         {
             me{
                 id
                 username
                 email
+                likeSet{
+                    track{
+                        id
+                    }
+                }
             }
         }
 `
