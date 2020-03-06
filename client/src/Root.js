@@ -9,9 +9,9 @@ import { gql } from "apollo-boost";
 import App from './pages/App'
 import Profile from './pages/Profile'
 import Header from './components/Shared/Header'
+import Footer from './components/Shared/Footer'
 import Loading from "./components/Shared/Loading";
 import Error from './components/Shared/Error'
-import { ProvidedRequiredArguments } from "graphql/validation/rules/ProvidedRequiredArguments";
 
 export const UserContext = React.createContext()
 
@@ -31,6 +31,7 @@ const Root = () => (
                             <Route exact path="/" component={App}/>
                             <Route path="/profile/:id" component={Profile} />
                         </Switch>
+                        <Footer/>
                     </UserContext.Provider>
                 </Router>
             )
@@ -52,17 +53,4 @@ export const ME_QUERY = gql`
             }
         }
 `
-// const GET_TRACKS_QUERY = gql`
-// {
-//     tracks{
-//        title
-//        id
-//        postedBy{
-//            username
-//            id
-//        } 
-//     }
-// }
-// `
-
 export default withRoot(Root);
